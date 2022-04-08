@@ -15,35 +15,36 @@
   <script src="https://js.arcgis.com/4.23/"></script>
   <script>
     require([
-      "esri/config",
       "esri/views/MapView",
-      "esri/layers/FeatureLayer",
-    ], (esriConfig, MapView, FeatureLayer)=> {
-
-      esriConfig.apiKey = "AAPK673cbbdcc1dc4933985c616545527a9fdBUc-vBqcxDqc5EVNeepRP0QMovNwL92S9VObVKWfhMDGcXeIU2H2cy-6oJhtMC7";
+      "esri/layers/Layer",
+    ], (MapView, Layer)=> {
       
       const params = new URLSearchParams(window.location.search)
       const defaultItemId = params.get("id")? params.get("id"): "7a262afa0a5845678762a5778c3e5248";
 
-      let fl = new FeatureLayer({
+      Layer.fromPortalItem({
         portalItem: {
           id: defaultItemId
-        },
-        refreshInterval: 0.1
+        }
+      }).then(async (layer) => {
+        
+        const view = new MapView({
+          container: "viewDiv",
+          map: {
+            basemap: "streets-navigation-vector",
+            layers: [layer]
+          },
+          center: [0,0],
+          zoom: 1,
+          constraints: {
+            snapToZoom: false
+          }
+        });
+        const l = view.map.layers.getItemAt(0)
+        l.refreshInterval = 0.1;
+      
       });
 
-      const view = new MapView({
-        container: "viewDiv",
-        map: {
-          basemap: "arcgis-navigation", //Basemap layer service
-          layers: [fl]
-        },
-        center: [0,0], //Longitude, latitude
-        zoom: 1,
-        constraints: {
-          snapToZoom: false
-        }
-      });
     });
   </script>
 </head>
